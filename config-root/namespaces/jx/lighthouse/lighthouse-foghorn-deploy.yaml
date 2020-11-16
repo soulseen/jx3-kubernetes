@@ -1,0 +1,65 @@
+# Source: lighthouse/templates/foghorn-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lighthouse-foghorn
+  labels:
+    draft: draft-app
+    chart: "lighthouse-0.0.874"
+    app: lighthouse-foghorn
+    gitops.jenkins-x.io/pipeline: 'namespaces'
+  namespace: jx
+  annotations:
+    wave.pusher.com/update-on-config-change: 'true'
+    jenkins-x.io/hash: '1799784d61358aea19e302b308366b8cd0c16f83150a7f2a8e9f5014aba9f5ac'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      draft: draft-app
+      app: lighthouse-foghorn
+  template:
+    metadata:
+      labels:
+        draft: draft-app
+        app: lighthouse-foghorn
+    spec:
+      serviceAccountName: lighthouse-foghorn
+      containers:
+        - name: lighthouse-foghorn
+          image: gcr.io/jenkinsxio/lighthouse-foghorn:0.0.874
+          imagePullPolicy: IfNotPresent
+          args:
+            - "--namespace=jx"
+          env:
+            - name: "GIT_KIND"
+              value: "github"
+            - name: "GIT_SERVER"
+              value: "https://github.com"
+            - name: "GIT_USER"
+              value: soulseen
+            - name: "GIT_TOKEN"
+              valueFrom:
+                secretKeyRef:
+                  name: lighthouse-oauth-token
+                  key: oauth
+            - name: "JX_LOG_FORMAT"
+              value: "json"
+            - name: "LOGRUS_FORMAT"
+              value: "json"
+            - name: DEFAULT_PIPELINE_RUN_SERVICE_ACCOUNT
+              value: "tekton-bot"
+            - name: DEFAULT_PIPELINE_RUN_TIMEOUT
+              value: "2h0m0s"
+            - name: JX_DEFAULT_IMAGE
+              value: "gcr.io/jenkinsxio/builder-maven:2.1.142-761"
+            - name: LIGHTHOUSE_DASHBOARD_TEMPLATE
+              value: "namespaces/{{ .Namespace }}/pipelineruns/{{ .PipelineRun }}"
+          resources:
+            limits:
+              cpu: 100m
+              memory: 256Mi
+            requests:
+              cpu: 80m
+              memory: 128Mi
+      terminationGracePeriodSeconds: 180

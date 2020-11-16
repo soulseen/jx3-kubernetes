@@ -29,6 +29,8 @@ jxRequirements:
         enabled: false
         production: false
     key: dev
+    owner: soulseen
+    repository: jx3-kubernetes
   - ingress:
       domain: ""
       externalDNS: false
@@ -49,7 +51,7 @@ jxRequirements:
     key: production
   gitops: true
   ingress:
-    domain: ""
+    domain: js.test.zxy
     externalDNS: false
     namespaceSubDomain: -jx.
     tls:
@@ -57,6 +59,8 @@ jxRequirements:
       enabled: false
       production: false
   kaniko: true
+  pipelineUser:
+    username: soulseen
   repository: bucketrepo
   secretStorage: local
   storage:
